@@ -352,3 +352,226 @@ git push
 Explanation:
 Pushes the changes to GitHub.
 
+Task 9 - Launch AWS EC2 instance
+
+Platform:
+AWS EC2 Management Console
+
+Configuration:
+Instance name: datasci350-quiz03
+Operating system: Ubuntu Server 26.04 LTS
+Instance type: t3.micro
+Key pair: datasci350-key
+Key pair type: ED25519
+Private key format: .pem
+SSH: Port 22
+Public DNS: ec2-3-138-153-100.us-east-2.compute.amazonaws.com
+Region: us-east-2
+
+Explanation:
+Launched an Ubuntu EC2 instance to run Python analysis
+in a cloud computing environment.
+
+Task 10 - Connect to AWS EC2 using SSH
+
+Command:
+chmod 400 ~/Downloads/datasci350-key.pem
+
+Explanation:
+Restricted permissions on the private SSH key.
+
+Command:
+ssh -i ~/Downloads/datasci350-key.pem ubuntu@ec2-3-138-153-100.us-east-2.compute.amazonaws.com
+
+Output:
+Connected successfully to Ubuntu 26.04.1 LTS.
+
+Remote terminal prompt:
+ubuntu@ip-172-31-16-128:~$
+
+Explanation:
+Used SSH to connect securely from my Mac to the EC2
+instance using an ED25519 private key.
+
+Task 11 - Install Python libraries on EC2
+
+Command:
+sudo apt update
+
+Output:
+Fetched 32.7 MB in 4s.
+46 packages can be upgraded.
+
+Explanation:
+Updated the Ubuntu package lists.
+
+Command:
+sudo apt install -y python3-pandas python3-matplotlib python3-seaborn
+
+Output:
+Successfully installed pandas, matplotlib, seaborn,
+and their required dependencies.
+No installation errors were reported.
+
+Explanation:
+Installed the Python libraries needed for data analysis
+and visualization on the EC2 instance.
+
+Task 12 - Transfer files to AWS
+
+Command:
+exit
+
+Explanation:
+Exited the SSH session and returned to my Mac terminal.
+
+Command:
+scp -i ~/Downloads/datasci350-key.pem aws/traffic_analysis.py aws/website_traffic.txt ubuntu@ec2-3-138-153-100.us-east-2.compute.amazonaws.com:~/
+
+Output:
+traffic_analysis.py    100% 1983
+website_traffic.txt    100% 2107
+
+Explanation:
+Successfully transferred the Python analysis script and
+website traffic dataset from my Mac to the AWS EC2 instance
+using SCP. Both files transferred at 100%.
+
+
+Task 13 - Run website traffic analysis on AWS
+
+Command:
+ssh -i ~/Downloads/datasci350-key.pem ubuntu@ec2-3-138-153-100.us-east-2.compute.amazonaws.com
+
+Explanation:
+Reconnected to the EC2 instance using SSH.
+
+Command:
+python3 traffic_analysis.py > results.txt
+
+Explanation:
+Executed the Python analysis on EC2 and saved its
+printed output in results.txt. The script also generated
+a visualization called traffic_analysis.png.
+
+Command:
+cat /var/lib/cloud/data/instance-id >> results.txt
+
+Explanation:
+Appended the EC2 instance ID to identify the machine
+that performed the analysis.
+
+Command:
+sha256sum results.txt > fingerprint.txt
+
+Explanation:
+Generated a SHA-256 checksum of the results file
+to allow its integrity to be verified later.
+
+Command:
+ls -lh results.txt fingerprint.txt traffic_analysis.png
+
+Explanation:
+Confirmed that the analysis output, checksum file,
+and visualization were successfully generated.
+
+Output:
+All three files were present on the EC2 instance.
+
+Command:
+cat results.txt
+
+Explanation:
+Inspected the analysis output and EC2 instance ID.
+
+Command:
+sed -i '$d' results.txt
+sha256sum results.txt > fingerprint.txt
+
+Explanation:
+Removed a duplicate instance ID line and regenerated
+the SHA-256 fingerprint for the corrected results.
+
+
+Task 14 - Download analysis results from AWS
+
+Command:
+exit
+
+Explanation:
+Exited the SSH session to return to my local Mac terminal.
+
+Command:
+scp -i ~/Downloads/datasci350-key.pem ubuntu@ec2-3-138-153-100.us-east-2.compute.amazonaws.com:~/results.txt ubuntu@ec2-3-138-153-100.us-east-2.compute.amazonaws.com:~/fingerprint.txt ubuntu@ec2-3-138-153-100.us-east-2.compute.amazonaws.com:~/traffic_analysis.png aws/
+
+Explanation:
+Downloaded the analysis results, SHA-256 fingerprint,
+and visualization from AWS into the local aws/ directory.
+
+Command:
+ls -lh aws/results.txt aws/fingerprint.txt aws/traffic_analysis.png
+
+Explanation:
+Verified that all three output files were downloaded
+successfully to the local repository.
+
+
+Task 15 - Final verification, cleanup, and submission
+
+Command:
+cd aws
+shasum -a 256 -c fingerprint.txt
+cd ..
+
+Explanation:
+Verified that the downloaded results.txt file matches
+the SHA-256 fingerprint generated on AWS.
+
+Output:
+results.txt: OK
+
+Question:
+Does stopping an EC2 instance eliminate all AWS charges?
+
+Answer:
+No. Stopping an EC2 instance generally stops compute
+charges, but attached EBS volumes and some public IPv4
+resources may still generate charges. Terminating the
+instance and removing unnecessary remaining resources
+helps avoid additional charges.
+
+AWS Cleanup:
+Terminated the EC2 instance through the AWS Management
+Console after downloading the required files.
+
+Command:
+git add aws/ commands.txt
+
+Explanation:
+Staged the AWS analysis files and updated documentation.
+
+Command:
+git commit -m "Add AWS analysis results"
+
+Explanation:
+Created a Git commit containing the AWS analysis
+outputs and final assignment documentation.
+
+Command:
+git push
+
+Explanation:
+Pushed the final changes to my GitHub repository.
+
+
+AI ACKNOWLEDGMENT
+
+I used ChatGPT to help understand the assignment,
+interpret terminal commands and outputs, troubleshoot
+errors, and organize my documentation. I executed
+the commands and reviewed the results myself.
+
+
+FINAL REPOSITORY
+
+https://github.com/julians2101-gif/datasci350-quiz03

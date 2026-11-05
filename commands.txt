@@ -125,8 +125,33 @@ This command does not download anything because the
 base model is already stored on my laptop.
 
 Output:
-[PASTE ACTUAL OUTPUT]
+gathering model components
+using existing layer sha256:431e956cac90a7e4d36a9b37bb086c413491c598bb51f90ada8e0c75d0219645
+using existing layer sha256:0f6ec9740c765c3fb0dc38fe25f4d283c3bc1ede32b76f81c3a971daef20f76c
+using existing layer sha256:cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30
+creating new layer sha256:a7e8f03e8e628f2b00aa7dcb7c19e314821c8be7380f6ab311152d68e492456d
+creating new layer sha256:655e6a1f5e4a106074e136d550cb8a95e47a92cb2aa2fc2d822634c3429e950e
+writing manifest
+success
 
+
+Modelfile contents:
+
+FROM granite4:350m
+
+PARAMETER temperature 0.7
+PARAMETER top_p 0.9
+
+SYSTEM """
+You are an extremely excited live sports commentator.
+
+Follow these three rules:
+1. Every answer must have at most four sentences.
+2. Always address the user as "sports fans".
+3. If you do not know something, clearly say on air that you do not know.
+
+Use energetic language like a live sports broadcast.
+"""
 
 Task 4 - Test the commentator model
 
@@ -230,12 +255,100 @@ git push
 Explanation:
 Uploads the commit to my GitHub repository.
 
-
-Task 6 - Fix commands.txt location
+Task 7 - Compare the base model and commentator
 
 Command:
-mv aws/commands.txt commands.txt
+python3 ollama/ask_local.py
+
+Original model: granite4:350m
+
+Output:
+The command `git commit` is used to commit changes made to a Git repository. It creates a commit message and adds the changes to the Git history.
+
+Token usage:
+prompt_tokens=36
+completion_tokens=32
+total_tokens=68
+
+Change:
+Changed model="granite4:350m" to model="commentator"
+in ollama/ask_local.py.
+
+Command:
+python3 ollama/ask_local.py
+
+Commentator output:
+Sports fans, I am here to provide you with accurate information. I do not know what the git commit command does.
+
+Token usage:
+prompt_tokens=131
+completion_tokens=25
+total_tokens=156
 
 Explanation:
-Moves commands.txt from the aws folder to the repository
-root, as required by the quiz instructions.
+The commentator used 131 prompt tokens compared to 36
+for the original model, an increase of 95 tokens. This
+happened because the commentator includes additional
+SYSTEM instructions and MESSAGE examples in its prompt.
+
+The commentator followed the "sports fans" rule but
+incorrectly claimed not to know what git commit does.
+
+Task 8 - Fix JSON generation
+
+Command:
+python3 ollama/ask_json.py
+
+Original output:
+{ "answer": "I do not know the current weather in Atlanta because
+
+finish_reason:
+length
+
+Error:
+json.decoder.JSONDecodeError: Unterminated string starting at: line 1 column 13 (char 12)
+
+Explanation:
+The model reached the 15-token limit before completing
+the JSON response. The incomplete JSON caused json.loads()
+to raise a JSONDecodeError.
+
+Change:
+Changed max_tokens=15 to max_tokens=200 in ollama/ask_json.py.
+
+Command:
+python3 ollama/ask_json.py
+
+New output:
+{ "answer": "I do not know the current weather in Atlanta because I cannot access real-time weather information!" }
+stop
+I do not know the current weather in Atlanta because I cannot access real-time weather information!
+
+Explanation:
+Increasing the token limit allowed the model to finish
+its JSON response. The finish_reason changed from "length"
+to "stop", and json.loads() successfully parsed the output.
+
+The response was valid JSON but answered the wrong question,
+likely because the Modelfile included a weather example.
+
+Activity 2 - Git commit
+
+Command:
+git add ollama/ commands.txt
+
+Explanation:
+Stages the updated Python scripts and documentation.
+
+Command:
+git commit -m "Add Python calls"
+
+Explanation:
+Creates a commit for Activity 2.
+
+Command:
+git push
+
+Explanation:
+Pushes the changes to GitHub.
+

@@ -566,12 +566,6 @@ Pushed the final changes to my GitHub repository.
 
 AI ACKNOWLEDGMENT
 
-I used ChatGPT to help understand the assignment,
-interpret terminal commands and outputs, troubleshoot
-errors, and organize my documentation. I executed
-the commands and reviewed the results myself.
-
-
-FINAL REPOSITORY
-
-https://github.com/julians2101-gif/datasci350-quiz03
+I used ChatGPT to fix an issue in Activity 1 regarding my commands.txt file. 
+I also used it in the first part of Activity 3 to help me understand how to set up the AWS 
+and start using it in terminal. Also used to to make sure my input in Commands.txt is correct and includes all commands.

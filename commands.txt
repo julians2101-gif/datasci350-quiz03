@@ -1,0 +1,241 @@
+
+QUIZ 03 - LOCAL LLMS AND CLOUD COMPUTING
+
+Repository:
+https://github.com/julians2101-gif/datasci350-quiz03
+
+SETUP
+
+Command:
+git clone https://github.com/julians2101-gif/datasci350-quiz03.git
+
+Explanation:
+Clones my GitHub fork to my laptop.
+
+Command:
+cd datasci350-quiz03
+
+Explanation:
+Moves into the repository directory.
+
+Command:
+code .
+
+Explanation:
+Opens the repository in Visual Studio Code.
+
+ACTIVITY 1 - OLLAMA
+
+Task 1 - Download and inspect granite4:350m
+
+Command:
+ollama pull granite4:350m
+
+Explanation:
+Downloads the granite4:350m language model to my laptop.
+
+Output:
+pulling manifest
+pulling 431e956cac90: 100% 708 MB
+pulling cfc7749b96f6: 100% 11 KB
+pulling 6a0b94d6bd7d: 100% 418 B
+verifying sha256 digest
+writing manifest
+success
+
+Command:
+ollama show granite4:350m
+
+Explanation:
+Displays the model architecture, parameter count,
+context length, quantization, and capabilities.
+
+Output:
+Model
+  architecture        granite
+  parameters          352.38M
+  context length      32768
+  embedding length    1024
+  quantization        BF16
+  template source     go_template
+
+Capabilities
+  completion
+  tools
+
+License
+  Apache License
+  Version 2.0, January 2004
+  ...
+
+Command:
+ollama ls
+
+Explanation:
+Lists all locally installed Ollama models and their sizes.
+
+Output:
+NAME                     ID              SIZE
+granite4:350m            5eee845b49c4    708 MB
+embeddinggemma:latest    85462619ee72    621 MB
+sorter-hot:latest        8ef9f5466421    1.3 GB
+sorter:latest            788977bb8ce5    1.3 GB
+financecoach:latest      8820dd8701bc    1.3 GB
+llama3.2:1b              baf6a787fdff    1.3 GB
+
+Size prediction:
+The model has 352.38 million parameters and uses BF16
+quantization, meaning 16 bits (2 bytes) per parameter.
+
+Predicted size = 352.38 million × 16 / 8
+Predicted size = 704.76 MB
+
+Actual size reported by ollama ls = 708 MB
+
+Difference = 3.24 MB
+
+The prediction is close to the actual size. The small
+difference comes from additional model data and metadata.
+
+Task 2 - Create the commentator Modelfile
+
+File:
+ollama/Modelfile
+
+Explanation:
+FROM selects granite4:350m as the base model.
+temperature 0.7 controls randomness in responses.
+top_p 0.9 limits token sampling.
+SYSTEM establishes an excited sports commentator persona.
+
+The three rules require answers to have at most four
+sentences, address the user as "sports fans", and admit
+uncertainty on air.
+
+Task 3 - Build the commentator model
+
+Command:
+ollama create commentator -f ollama/Modelfile
+
+Explanation:
+Creates a customized model called commentator using
+the Modelfile and the locally downloaded Granite model.
+
+This command does not download anything because the
+base model is already stored on my laptop.
+
+Output:
+[PASTE ACTUAL OUTPUT]
+
+
+Task 4 - Test the commentator model
+
+Command:
+ollama run commentator "What does git commit do?"
+
+Explanation:
+Tests the commentator's behavior on a technical question.
+
+Response:
+Sports fans, welcome to today's sports commentary! Let's dive into the world of Git commits. Git commits are a powerful feature that allows you to track changes to your code. They help you keep your code organized and can be used to make changes and revert to previous versions if needed.
+
+Rule 1 (maximum four sentences): Held - exactly 4 sentences.
+Rule 2 (addresses "sports fans"): Held.
+Rule 3 (admits uncertainty): Not applicable because the model answered the question.
+
+Command:
+ollama run commentator "What is the weather in Atlanta right now?"
+
+Explanation:
+Tests whether the model admits uncertainty about live information.
+
+Response:
+I'm an AI and I don't have real-time capabilities. I'm here to provide information based on the data I was trained on. I apologize for any confusion.
+
+Rule 1 (maximum four sentences): Held - 3 sentences.
+Rule 2 (addresses "sports fans"): Broke - did not address the user as "sports fans".
+Rule 3 (admits uncertainty): Held - acknowledged that it lacks real-time capabilities.
+
+Task 5 - Teach the commentator by example
+
+File:
+ollama/Modelfile
+
+Change:
+Added a MESSAGE example showing how the commentator
+should admit it does not know the current weather.
+
+Command:
+ollama create commentator -f ollama/Modelfile
+
+Output:
+gathering model components
+using existing layer sha256:431e956cac90a7e4d36a9b37bb086c413491c598bb51f90ada8e0c75d0219645
+using existing layer sha256:0f6ec9740c765c3fb0dc38fe25f4d283c3bc1ede32b76f81c3a971daef20f76c
+using existing layer sha256:cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30
+using existing layer sha256:a7e8f03e8e628f2b00aa7dcb7c19e314821c8be7380f6ab311152d68e492456d
+using existing layer sha256:655e6a1f5e4a106074e136d550cb8a95e47a92cb2aa2fc2d822634c3429e950e
+creating new layer sha256:723aab61e5fc3505a296e4f41dce109428f0a8a8760662893d8a8e7797114e6e
+writing manifest
+success
+
+Explanation:
+Rebuilt the commentator model with the new example
+conversation to improve its response to weather questions.
+
+Command:
+ollama run commentator "What is the weather in Atlanta right now?"
+
+Response 1:
+Sports fans, I am currently broadcasting the weather in Atlanta. I do not know the current weather conditions.
+
+Command:
+ollama run commentator "What is the weather in Atlanta right now?"
+
+Response 2:
+Sports fans, I am here to provide you with accurate weather updates. Currently, I do not have the information you are looking for about the weather in Atlanta.
+
+Command:
+ollama run commentator "What is the weather in Atlanta right now?"
+
+Response 3:
+Sports fans, I am here to provide you with accurate information. I do not have the ability to access real-time weather data.
+
+Conclusion:
+The model admitted it did not know the weather in 3 out
+of 3 responses.
+
+All three responses addressed the user as "sports fans"
+and contained fewer than four sentences.
+
+The MESSAGE example helped reinforce the desired behavior.
+
+Task 6 - Commit and push Activity 1
+
+Command:
+git add ollama/ commands.txt
+
+Explanation:
+Stages the Ollama files and commands.txt for the commit.
+
+Command:
+git commit -m "Add commentator chatbot"
+
+Explanation:
+Creates a Git commit containing the chatbot and documentation.
+
+Command:
+git push
+
+Explanation:
+Uploads the commit to my GitHub repository.
+
+
+Task 6 - Fix commands.txt location
+
+Command:
+mv aws/commands.txt commands.txt
+
+Explanation:
+Moves commands.txt from the aws folder to the repository
+root, as required by the quiz instructions.
